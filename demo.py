@@ -17,6 +17,8 @@ from utils.interp import lerp, slerp
 from utils.metrics.distance import chamfer_distance
 from utils.render import render_point_clouds
 
+st.set_page_config(layout="wide")
+
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.benchmark = True  # False
 torch.backends.cudnn.deterministic = True
@@ -583,8 +585,6 @@ def inversion():
 
 
 if __name__ == "__main__":
-    st.set_page_config(layout="wide")
-
     st.title("dusty-gan demo")
     st.text(
         'Kazuto Nakashima and Ryo Kurazume, "Learning to Drop Points for LiDAR Scan Synthesis", IROS 2021'

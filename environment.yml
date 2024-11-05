@@ -1,0 +1,30 @@
+name: dusty-gan
+channels:
+    - pytorch
+    - menpo
+    - conda-forge
+    - anaconda
+dependencies:
+  - ipython
+  - matplotlib
+  - pip
+  - python=3.8
+  - pytorch==1.8.1
+  - torchvision==0.9.1
+  - cudatoolkit=11.3
+  - tqdm
+  - pip:
+      - black
+      - einops
+      - hydra_colorlog
+      - hydra-core
+      - joblib
+      - kornia
+      - mypy
+      - numba
+      - omegaconf
+      - opencv-python
+      - pandas
+      - scikit-learn
+      - streamlit
+      - tensorflow

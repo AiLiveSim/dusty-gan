@@ -11,7 +11,7 @@
 
 #include <ATen/ATen.h>
 #include <ATen/cuda/CUDAApplyUtils.cuh> // at::cuda::getApplyGrid
-#include <THC/THC.h>
+//#include <THC/THC.h>
 
 #define CHECK_CUDA(x)                                                          \
   TORCH_CHECK(x.type().is_cuda(), #x " must be a CUDA tensor")
@@ -191,9 +191,9 @@ at::Tensor ApproxMatchForward(const at::Tensor xyz1, const at::Tensor xyz2) {
   const auto n = xyz1.size(1);
   const auto m = xyz2.size(1);
 
-  CHECK_EQ(xyz2.size(0), b);
-  CHECK_EQ(xyz1.size(2), 3);
-  CHECK_EQ(xyz2.size(2), 3);
+  TORCH_CHECK(xyz2.size(0) == b, "xyz2.size(0) should be equal to ", b);
+  TORCH_CHECK(xyz1.size(2) == 3, "xyz1.size(2) should be 3, but got ", xyz1.size(2));
+  TORCH_CHECK(xyz2.size(2) == 3, "xyz2.size(2) should be 3, but got ", xyz2.size(2));
   CHECK_INPUT(xyz1);
   CHECK_INPUT(xyz2);
 
@@ -206,7 +206,7 @@ at::Tensor ApproxMatchForward(const at::Tensor xyz1, const at::Tensor xyz2) {
             <<<32, 512>>>(b, n, m, xyz1.data<scalar_t>(), xyz2.data<scalar_t>(),
                           match.data<scalar_t>(), temp.data<scalar_t>());
       }));
-  THCudaCheck(cudaGetLastError());
+  AT_CUDA_CHECK(cudaGetLastError());
 
   return match;
 }
@@ -283,9 +283,9 @@ at::Tensor MatchCostForward(const at::Tensor xyz1, const at::Tensor xyz2,
   const auto n = xyz1.size(1);
   const auto m = xyz2.size(1);
 
-  CHECK_EQ(xyz2.size(0), b);
-  CHECK_EQ(xyz1.size(2), 3);
-  CHECK_EQ(xyz2.size(2), 3);
+  TORCH_CHECK(xyz2.size(0) == b, "Size mismatch: xyz2.size(0) is ", xyz2.size(0), " but expected ", b);
+  TORCH_CHECK(xyz1.size(2) == 3, "Size mismatch: xyz1.size(2) is ", xyz1.size(2), " but expected 3");
+  TORCH_CHECK(xyz2.size(2) == 3, "Size mismatch: xyz2.size(2) is ", xyz2.size(2), " but expected 3");
   CHECK_INPUT(xyz1);
   CHECK_INPUT(xyz2);
 
@@ -297,7 +297,7 @@ at::Tensor MatchCostForward(const at::Tensor xyz1, const at::Tensor xyz2,
             <<<32, 512>>>(b, n, m, xyz1.data<scalar_t>(), xyz2.data<scalar_t>(),
                           match.data<scalar_t>(), cost.data<scalar_t>());
       }));
-  THCudaCheck(cudaGetLastError());
+  AT_CUDA_CHECK(cudaGetLastError());
 
   return cost;
 }
@@ -411,9 +411,9 @@ std::vector<at::Tensor> MatchCostBackward(const at::Tensor grad_cost,
   const auto n = xyz1.size(1);
   const auto m = xyz2.size(1);
 
-  CHECK_EQ(xyz2.size(0), b);
-  CHECK_EQ(xyz1.size(2), 3);
-  CHECK_EQ(xyz2.size(2), 3);
+  TORCH_CHECK(xyz2.size(0) == b, "xyz2.size(0) must be equal to ", b, ", but got ", xyz2.size(0));
+  TORCH_CHECK(xyz1.size(2) == 3, "xyz1.size(2) must be 3, but got ", xyz1.size(2));
+  TORCH_CHECK(xyz2.size(2) == 3, "xyz2.size(2) must be 3, but got ", xyz2.size(2));
   CHECK_INPUT(xyz1);
   CHECK_INPUT(xyz2);
 
@@ -431,7 +431,7 @@ std::vector<at::Tensor> MatchCostBackward(const at::Tensor grad_cost,
             xyz2.data<scalar_t>(), match.data<scalar_t>(),
             grad2.data<scalar_t>());
       }));
-  THCudaCheck(cudaGetLastError());
+  AT_CUDA_CHECK(cudaGetLastError());
 
   return std::vector<at::Tensor>({grad1, grad2});
 }
